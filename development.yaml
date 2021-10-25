@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  izboridb:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    #volumes:
+    #  - izboridbdata:/var/lib/mysql
+    networks:
+      - izborinet
+    ports:
+    - 6036:3306
+  izboridbmigration:
+    image: izboridbmigration
+    restart: on-failure
+    environment:
+      - IZBORI_DATABASE_URL=izboridb
+    networks:
+      - izborinet
+  admin:
+    image: admin
+    environment:
+      - IZBORI_DATABASE_URL=izboridb
+    ports:
+    - 5005:5005
+    networks:
+      - izborinet
+  daemon:
+    image: redis
+    environment:
+      - TZ=Europe/Belgrade
+    ports:
+    - 6379:6379
+    networks:
+      - zvanicnikredis
+  daemonthread:
+    image: daemonthread
+    environment:
+      - IZBORI_DATABASE_URL=izboridb
+    ports:
+    - 5010:5010
+    networks:
+      - izborinet
+      - zvanicnikredis
+  izbornizvanicnik:
+    image: izbornizvanicnik
+    ports:
+    - 5015:5015
+    networks:
+      - zvanicnikredis
+    deploy:
+      replicas: 3
+  adminer:
+    image: adminer
+    ports:
+      - 8081:8080
+    networks:
+      - izborinet
+
+volumes:
+  izboridbdata:
+networks:
+  izborinet:
+    driver: overlay
+  zvanicnikredis:
+    driver: overlay

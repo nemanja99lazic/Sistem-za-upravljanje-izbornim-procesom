@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  authenticationdb:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    #volumes: # sluzi da sve iz nase baze cuvamo na virtuelnom hard disku koji smo kreirali ispod
+    #  - authdbdata:/var/lib/mysql
+    networks:
+      - authnet
+    ports:
+    - 6035:3306
+  authenticationdbmigration:
+    image: authenticationdbmigration
+    restart: on-failure
+    environment:
+      - DATABASE_URL=authenticationdb
+    networks:
+      - authnet
+  authentication:
+    image: authentication
+    environment:
+      - DATABASE_URL=authenticationdb
+    ports:
+    - 5002:5002
+    networks: # dodaj servis mrezi
+      - authnet
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - authnet
+
+volumes: # kreiramo virtuelni hard disk db data
+  authdbdata:
+
+networks: # kreiraj mrezu servisa
+  authnet:
+    driver: overlay
+
+# info o hard disku moze da se vidi na \\wsl$

@@ -1,0 +1,1 @@
+python main.py --type all --authentication-address http://localhost:5002 --jwt-secret "Tajni JWT kljuc koji niko ne zna" --roles-field roles --administrator-role admin --user-role "izborni zvanicnik" --administrator-address http://localhost:5005 --station-address http://127.0.0.1:5015 --with-authentication
